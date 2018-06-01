@@ -16,21 +16,17 @@ class  ClientUI(QMainWindow,client_ui.Ui_MainWindow):
     def __init__(self):
         super(self.__class__,self).__init__()
         self.setupUi(self)
-        #self.client_connect()
+        self.c = Client('140.138.145.59', 5550)
         self.pushButton.clicked.connect(self.login)
         self.pushButton_2.clicked.connect(self.changep)
         self.pushButton_3.clicked.connect(self.send)
 
 
-    def client_connect(self):
-        c = Client('140.138.145.59', 5550)
-
     def sendThreadFunc(self):
 
         try:
             myword=self.lineEdit_4.text()
-            c = Client('140.138.145.59', 5550)
-            c.sock.send(myword.encode())
+            self.c.sock.send(myword.encode())
         except ConnectionAbortedError:
             print('Server closed this connection!')
 
@@ -40,7 +36,7 @@ class  ClientUI(QMainWindow,client_ui.Ui_MainWindow):
     def recvThreadFunc(self):
         while True:
             try:
-                otherword = self.sock.recv(1024) # socket.recv(recv_size)
+                otherword = self.c.sock.recv(1024) # socket.recv(recv_size)
                 self.textBrowser.append(otherword.decode())
                 self.textBrowser.update()
             except ConnectionAbortedError:
@@ -65,10 +61,8 @@ class  ClientUI(QMainWindow,client_ui.Ui_MainWindow):
         th1 = threading.Thread(target=self.sendThreadFunc)
         th1.setDaemon(True)
         th1.start()
-        th1.join()
 
     def changep(self):
-        #self.sock.send(self.lineEdit.text().encode(()))
         mes = " \n                                         " + self.lineEdit.text() + ": You"
         self.textBrowser.append(mes)
         self.textBrowser.update()

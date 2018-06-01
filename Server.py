@@ -14,8 +14,7 @@ class Server:
         self.sock.bind((host, port))
         self.sock.listen(5)
         print('Server', socket.gethostbyname(host), 'listening ...')
-        self.mylist = list()
-        self.people=0
+
     def checkConnection(self):
         connection, addr = self.sock.accept()
         print('Accept a new connection', connection.getsockname(), connection.fileno())
@@ -33,6 +32,39 @@ class Server:
                 connection.close()
         except:
             pass
+
+class ServerUI(QMainWindow,server_ui.Ui_MainWindow):
+    def __init__(self):
+        super(self.__class__,self).__init__()
+        self.setupUi(self)
+
+        self.s = Server('140.138.145.59', 5550)
+        self.s.checkConnection()
+        self.mylist = list()
+        self.people=0
+
+        self.lineEdit_2.setEchoMode(QLineEdit.Password)
+        self.dbChatRoom = DataBaseChatRoom()
+        self.dbChatRoom.collection.delete_many({})
+        self.dbChatRoom.Initdatabase()
+        self.dbChatRoom.colseClient()
+        self.update_textBrowser()
+        self.pushButton.clicked.connect(self.add)
+
+    def add(self):
+        uname =  self.lineEdit.displayText()
+        upwd = self.lineEdit_2.displayText()
+        s = {'uname': uname, 'upwd': upwd}
+        self.dbChatRoom.collection.insert_one(s)
+        self.update_textBrowser()
+
+    def update_textBrowser(self):
+        cursor = self.dbChatRoom.collection.find()
+        data = [d for d in cursor]
+        u = ""
+        for i in data:
+            u += str(i["uname"]) + ","
+        self.textBrowser.setText(u)
 
     # send whatToSay to every except people in exceptNum
     def tellOthers(self, exceptNum, whatToSay):
@@ -73,31 +105,6 @@ class Server:
                 return
 
 
-class ServerUI(QMainWindow,server_ui.Ui_MainWindow):
-    def __init__(self):
-        super(self.__class__,self).__init__()
-        self.setupUi(self)
-        self.lineEdit_2.setEchoMode(QLineEdit.Password)
-        self.dbChatRoom = DataBaseChatRoom()
-        self.dbChatRoom.collection.delete_many({})
-        self.dbChatRoom.Initdatabase()
-        self.dbChatRoom.colseClient()
-        self.update_textBrowser()
-        self.pushButton.clicked.connect(self.add)
-    def add(self):
-        uname =  self.lineEdit.displayText()
-        upwd = self.lineEdit_2.displayText()
-        s = {'uname': uname, 'upwd': upwd}
-        self.dbChatRoom.collection.insert_one(s)
-        self.update_textBrowser()
-
-    def update_textBrowser(self):
-        cursor = self.dbChatRoom.collection.find()
-        data = [d for d in cursor]
-        u = ""
-        for i in data:
-            u += str(i["uname"]) + ","
-        self.textBrowser.setText(u)
 class DataBaseChatRoom:
     def __init__(self):
         self.client = MongoClient('localhost', 27017)  # 比较常用
@@ -152,13 +159,10 @@ class DataBaseChatRoom:
 
 
 def main():
-    s =Server('140.138.145.59', 5550)
     app=QApplication(sys.argv)
     MainWindow=ServerUI()
     MainWindow.show()
     sys.exit(app.exec_())
-    while True:
-        s.checkConnection()
 
 
 if __name__ == "__main__":
