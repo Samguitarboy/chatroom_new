@@ -27,8 +27,6 @@ class Server:
                 mythread = threading.Thread(target=self.subThreadIn, args=(connection, connection.fileno()))
                 mythread.setDaemon(True)
                 mythread.start()
-                connection.send(b'Welcome to Chat room!')
-                connection.send(b'Input your nickname: ' )
 
             else:
                 connection.send(b'please go out!')
@@ -154,15 +152,13 @@ class DataBaseChatRoom:
 
 
 def main():
+    s =Server('140.138.145.59', 5550)
     app=QApplication(sys.argv)
     MainWindow=ServerUI()
     MainWindow.show()
     sys.exit(app.exec_())
-    s = Server('140.138.145.59', 5550)
-
     while True:
         s.checkConnection()
-
 
 
 if __name__ == "__main__":
