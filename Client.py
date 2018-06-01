@@ -11,11 +11,25 @@ class Client:
         self.sock = sock
         self.sock.connect((host, port))
         self.sock.send(b'1')
+
+class  ClientUI(QMainWindow,client_ui.Ui_MainWindow):
+    def __init__(self):
+        super(self.__class__,self).__init__()
+        self.setupUi(self)
+        self.client_connect()
+        self.pushButton.clicked.connect(self.login)
+        self.pushButton_2.clicked.connect(self.changep)
+        self.pushButton_3.clicked.connect(self.send)
+
+
+    def client_connect(self):
+        Client('140.138.145.59', 5550)
+
     def sendThreadFunc(self):
         while True:
             try:
-                word = self.sock.recv(1024) # socket.recv(recv_size)
-                print(word.decode())
+                myword=self.lineEdit_4.text()
+                self.sock.send(myword.encode())
             except ConnectionAbortedError:
                 print('Server closed this connection!')
 
@@ -26,52 +40,44 @@ class Client:
         while True:
             try:
                 otherword = self.sock.recv(1024) # socket.recv(recv_size)
-                print(otherword.decode())
+                self.textBrowser.append(otherword.decode())
+                self.textBrowser.update()
             except ConnectionAbortedError:
                 print('Server closed this connection!')
 
             except ConnectionResetError:
                 print('Server is closed!')
 
-class Main(QMainWindow,client_ui.Ui_MainWindow,Client):
-    def __init__(self):
-        super(self.__class__,self).__init__()
-        self.setupUi(self)
-        self.pushButton_2.setText("Send")
-        self.pushButton_2.clicked.connect(self.login)
-        self.pushButton.clicked.connect(self.send)
     def login(self):
-        text="Welcome to chat room !" + self.textEdit.toPlainText() + "\nNow let\'s chat !"  +  self.textEdit.toPlainText()
+        text="Welcome to chat room !" + self.lineEdit.text() + "\nNow let\'s chat !"  +  self.lineEdit.text()
         self.textBrowser.append(text)
         self.textBrowser.update()
-        self.lineEdit.setText("")
-        self.pushButton_2.setDisabled(True)
-        self.textEdit.setDisabled(True)
-        self.pushButton.setDisabled(False)
-        self.nickname=self.textEdit.toPlainText()
-        #self.sock.send(self.nickname.encode())
+        self.pushButton.setDisabled(True)
+        self.lineEdit.setDisabled(True)
+        self.lineEdit_2.setDisabled(True)
+        self.pushButton_3.setDisabled(False)
 
     def send(self):
+        mes = " \n                                         " + self.lineEdit_4.text() + ": You"
+        self.textBrowser.append(mes)
+        self.textBrowser.update()
+        th1 = threading.Thread(target=self.sendThreadFunc)
+        th1.setDaemon(True)
+        th1.start()
+        th1.join()
+
+    def changep(self):
         #self.sock.send(self.lineEdit.text().encode(()))
         mes = " \n                                         " + self.lineEdit.text() + ": You"
         self.textBrowser.append(mes)
         self.textBrowser.update()
 
 def main():
+
     app=QApplication(sys.argv)
-    MainWindow=Main()
+    MainWindow=ClientUI()
     MainWindow.show()
     sys.exit(app.exec_())
-    c = Client('140.138.145.59', 5550)
-    th1 = threading.Thread(target=c.sendThreadFunc)
-    th2 = threading.Thread(target=c.recvThreadFunc)
-    threads = [th1, th2]
-
-    for t in threads:
-        t.setDaemon(True)
-        t.start()
-
-    t.join()
 
 
 if __name__ == "__main__":

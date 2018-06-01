@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'D:\chatroom3\client.ui'
+# Form implementation generated from reading ui file 'D:\chatroom_new\client.ui'
 #
 # Created by: PyQt5 UI code generator 5.10.1
 #
@@ -48,6 +48,7 @@ class Ui_MainWindow(object):
         self.lineEdit_4.setGeometry(QtCore.QRect(20, 560, 421, 31))
         self.lineEdit_4.setObjectName("lineEdit_4")
         self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_3.setEnabled(False)
         self.pushButton_3.setGeometry(QtCore.QRect(20, 600, 421, 31))
         self.pushButton_3.setObjectName("pushButton_3")
         MainWindow.setCentralWidget(self.centralwidget)
