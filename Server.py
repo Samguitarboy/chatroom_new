@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
 import socket
 import threading
-from PyQt5.QtWidgets import QMainWindow,QApplication
+from PyQt5.QtWidgets import QMainWindow,QApplication, QLineEdit
 import server_ui
 import sys
 from time import gmtime, strftime
-
+from pymongo import MongoClient
 
 class Server:
     def __init__(self, host, port):
@@ -79,7 +79,78 @@ class ServerUI(QMainWindow,server_ui.Ui_MainWindow):
     def __init__(self):
         super(self.__class__,self).__init__()
         self.setupUi(self)
+        self.lineEdit_2.setEchoMode(QLineEdit.Password)
+        self.dbChatRoom = DataBaseChatRoom()
+        self.dbChatRoom.collection.delete_many({})
+        self.dbChatRoom.Initdatabase()
+        self.dbChatRoom.colseClient()
+        self.update_textBrowser()
+        self.pushButton.clicked.connect(self.add)
+    def add(self):
+        uname =  self.lineEdit.displayText()
+        upwd = self.lineEdit_2.displayText()
+        s = {'uname': uname, 'upwd': upwd}
+        self.dbChatRoom.collection.insert_one(s)
+        self.update_textBrowser()
 
+    def update_textBrowser(self):
+        cursor = self.dbChatRoom.collection.find()
+        data = [d for d in cursor]
+        u = ""
+        for i in data:
+            u += str(i["uname"]) + ","
+        self.textBrowser.setText(u)
+class DataBaseChatRoom:
+    def __init__(self):
+        self.client = MongoClient('localhost', 27017)  # 比较常用
+        self.database = self.client["ChatRoom"]  # SQL: Database Name
+        self.collection = self.database["user"]  # SQL: Table Name
+
+    def loadData(self):
+        pass
+        return None
+
+    # delete user by uname
+    # dbChatRoom.deleteUser(['A'])
+    def deleteUser(self, unameList=None):
+        pass
+        return 'successful'
+
+    # insert user
+    # dbChatRoom.insertUser(uname='A', upwd='A')
+    def insertUser(self, uname=None, upwd=None):
+        pass
+        return 'successful'
+
+    def updataUser(self, uname=None, upwd=None):
+        pass
+        return 'successful'
+
+    # check checkUserExist
+    def checkUserExist(self, uname='A'):
+        pass
+        return False
+
+    # query user bu uname
+    # dbChatRoom.queryByuname(uname='A', upwd='A')
+    def queryByuname(self, uname='A', upwd='A'):
+        pass
+        return False
+
+    # Init database
+    # dbChatRoom.Initdatabase()
+    def Initdatabase(self):
+
+        userList = []
+        userList.append({'uname': 'A', 'upwd': 'A'})
+        userList.append({'uname': 'B', 'upwd': 'B'})
+        userList.append({'uname': 'C', 'upwd': 'C'})
+        userList.append({'uname': 'D', 'upwd': 'D'})
+        userList.append({'uname': 'E', 'upwd': 'E'})
+        self.collection.insert_many(userList)
+
+    def colseClient(self):
+        self.client.close()
 
 
 def main():
@@ -88,9 +159,12 @@ def main():
     MainWindow.show()
     sys.exit(app.exec_())
     s = Server('140.138.145.59', 5550)
+
     while True:
         s.checkConnection()
 
 
+
 if __name__ == "__main__":
     main()
+
