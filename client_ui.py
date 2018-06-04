@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'D:\chatroom_new\client.ui'
+# Form implementation generated from reading ui file 'C:\Users\user\Desktop\最後的禮物\開放平台~\chatroom_new-master\chatroom_new-master\client.ui'
 #
 # Created by: PyQt5 UI code generator 5.10.1
 #
@@ -15,7 +15,7 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(170, 20, 91, 20))
+        self.label.setGeometry(QtCore.QRect(160, 20, 131, 20))
         self.label.setObjectName("label")
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         self.label_2.setGeometry(QtCore.QRect(30, 70, 91, 20))
@@ -51,6 +51,9 @@ class Ui_MainWindow(object):
         self.pushButton_3.setEnabled(False)
         self.pushButton_3.setGeometry(QtCore.QRect(20, 600, 421, 31))
         self.pushButton_3.setObjectName("pushButton_3")
+        self.label_4 = QtWidgets.QLabel(self.centralwidget)
+        self.label_4.setGeometry(QtCore.QRect(250, 20, 91, 20))
+        self.label_4.setObjectName("label_4")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 467, 22))
@@ -66,10 +69,11 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.label.setText(_translate("MainWindow", "目前聊天室有0人"))
+        self.label.setText(_translate("MainWindow", "目前聊天室有           人"))
         self.label_2.setText(_translate("MainWindow", "NickName"))
         self.pushButton.setText(_translate("MainWindow", "Login"))
         self.label_3.setText(_translate("MainWindow", "change Password"))
         self.pushButton_2.setText(_translate("MainWindow", "update password"))
         self.pushButton_3.setText(_translate("MainWindow", "Send"))
+        self.label_4.setText(_translate("MainWindow", "0"))
 

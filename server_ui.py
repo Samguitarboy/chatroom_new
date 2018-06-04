@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'D:\chatroom_new\server.ui'
+# Form implementation generated from reading ui file 'C:\Users\user\Desktop\最後的禮物\開放平台~\chatroom_new-master\chatroom_new-master\server.ui'
 #
 # Created by: PyQt5 UI code generator 5.10.1
 #
@@ -36,6 +36,33 @@ class Ui_MainWindow(object):
         self.textBrowser = QtWidgets.QTextBrowser(self.centralwidget)
         self.textBrowser.setGeometry(QtCore.QRect(10, 120, 431, 391))
         self.textBrowser.setObjectName("textBrowser")
+        self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 130, 33, 351))
+        self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
+        self.vertical = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
+        self.vertical.setContentsMargins(0, 0, 0, 0)
+        self.vertical.setSpacing(0)
+        self.vertical.setObjectName("vertical")
+        self.checkBox_2 = QtWidgets.QCheckBox(self.verticalLayoutWidget)
+        self.checkBox_2.setCheckable(True)
+        self.checkBox_2.setObjectName("checkBox_2")
+        self.vertical.addWidget(self.checkBox_2)
+        self.checkBox_3 = QtWidgets.QCheckBox(self.verticalLayoutWidget)
+        self.checkBox_3.setCheckable(True)
+        self.checkBox_3.setObjectName("checkBox_3")
+        self.vertical.addWidget(self.checkBox_3)
+        self.checkBox_4 = QtWidgets.QCheckBox(self.verticalLayoutWidget)
+        self.checkBox_4.setCheckable(True)
+        self.checkBox_4.setObjectName("checkBox_4")
+        self.vertical.addWidget(self.checkBox_4)
+        self.checkBox_6 = QtWidgets.QCheckBox(self.verticalLayoutWidget)
+        self.checkBox_6.setCheckable(True)
+        self.checkBox_6.setObjectName("checkBox_6")
+        self.vertical.addWidget(self.checkBox_6)
+        self.checkBox_5 = QtWidgets.QCheckBox(self.verticalLayoutWidget)
+        self.checkBox_5.setCheckable(True)
+        self.checkBox_5.setObjectName("checkBox_5")
+        self.vertical.addWidget(self.checkBox_5)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 465, 22))
@@ -55,4 +82,9 @@ class Ui_MainWindow(object):
         self.label_2.setText(_translate("MainWindow", "Password"))
         self.pushButton.setText(_translate("MainWindow", "Add"))
         self.pushButton_2.setText(_translate("MainWindow", "Del"))
+        self.checkBox_2.setText(_translate("MainWindow", "A"))
+        self.checkBox_3.setText(_translate("MainWindow", "B"))
+        self.checkBox_4.setText(_translate("MainWindow", "C"))
+        self.checkBox_6.setText(_translate("MainWindow", "D"))
+        self.checkBox_5.setText(_translate("MainWindow", "E"))
 

@@ -1,63 +1,84 @@
 import socket
 import threading
-from PyQt5.QtWidgets import QMainWindow,QApplication
+from PyQt5.QtWidgets import QMainWindow,QApplication,QPushButton
+from time import strftime
 import client_ui
 import sys
-
-
-class Client:
-    def __init__(self, host, port):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock = sock
-        self.sock.connect((host, port))
-        self.sock.send(b'1')
 
 class  ClientUI(QMainWindow,client_ui.Ui_MainWindow):
     def __init__(self):
         super(self.__class__,self).__init__()
+        #建立socket連線
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock = sock
+        self.sock.connect(('localhost', 5550))
+        self.sock.send(b'1')
+        #GUI設定好
         self.setupUi(self)
-        self.c = Client('140.138.145.59', 5550)
+        self.setWindowTitle("Chat Application")
+        #按按鈕做相應的事件
         self.pushButton.clicked.connect(self.login)
         self.pushButton_2.clicked.connect(self.changep)
         self.pushButton_3.clicked.connect(self.send)
+        #起一個thread做接受訊息
+        th2 = threading.Thread(target=self.recvThreadFunc)
+        th2.setDaemon(True)
+        th2.start()
+
+    #將進入聊天室的名子傳給ser
+    def system_notice(self):
+       self.sock.send(self.lineEdit.text().encode())
 
 
+    #client傳訊息給server
     def sendThreadFunc(self):
-
         try:
-            myword=self.lineEdit_4.text()
-            self.c.sock.send(myword.encode())
+            sendtext =  self.lineEdit_4.text()  +'                  ['+strftime("%T")+']'
+            self.sock.send(sendtext.encode())
+
         except ConnectionAbortedError:
             print('Server closed this connection!')
-
         except ConnectionResetError:
             print('Server is closed!')
 
+    # client接收sevrver傳來的訊息
     def recvThreadFunc(self):
         while True:
             try:
-                otherword = self.c.sock.recv(1024) # socket.recv(recv_size)
-                self.textBrowser.append(otherword.decode())
+                otherword = self.sock.recv(1024) # socket.recv(recv_size)
+                print(otherword.decode())
+                self.label_4.setText(otherword.decode()[0:1])
+                self.textBrowser.append(otherword.decode()[1:])
                 self.textBrowser.update()
+
             except ConnectionAbortedError:
                 print('Server closed this connection!')
 
             except ConnectionResetError:
                 print('Server is closed!')
 
+    #login鈕按下去，檢查資料是否存在，並打招呼(login那排鎖起來，send鈕變正常)
     def login(self):
         text="Welcome to chat room !" + self.lineEdit.text() + "\nNow let\'s chat !"  +  self.lineEdit.text()
         self.textBrowser.append(text)
         self.textBrowser.update()
+        #傳給server名子
+        th2 = threading.Thread(target=self.system_notice)
+        th2.setDaemon(True)
+        th2.start()
+
+        self.label_4.setText('1')
         self.pushButton.setDisabled(True)
         self.lineEdit.setDisabled(True)
         self.lineEdit_2.setDisabled(True)
         self.pushButton_3.setDisabled(False)
 
+    # send鈕按下去，在自己視窗顯示mes，而另起一個thread傳我傳的訊息給server
     def send(self):
-        mes = " \n                                         " + self.lineEdit_4.text() + ": You"
+        mes = " \n                                             " + self.lineEdit_4.text() + ": You"
         self.textBrowser.append(mes)
         self.textBrowser.update()
+
         th1 = threading.Thread(target=self.sendThreadFunc)
         th1.setDaemon(True)
         th1.start()
@@ -69,10 +90,9 @@ class  ClientUI(QMainWindow,client_ui.Ui_MainWindow):
 
 def main():
     app=QApplication(sys.argv)
-    MainWindow=ClientUI()
-    MainWindow.show()
+    clientWindow=ClientUI()
+    clientWindow.show()
     sys.exit(app.exec_())
-
 
 if __name__ == "__main__":
     main()
