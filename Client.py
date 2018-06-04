@@ -4,10 +4,14 @@ from PyQt5.QtWidgets import QMainWindow,QApplication,QPushButton
 from time import strftime
 import client_ui
 import sys
+from pymongo import MongoClient
 
 class  ClientUI(QMainWindow,client_ui.Ui_MainWindow):
     def __init__(self):
         super(self.__class__,self).__init__()
+
+        self.dbChatRoom = DataBaseChatRoom()
+
         #建立socket連線
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock = sock
@@ -20,6 +24,9 @@ class  ClientUI(QMainWindow,client_ui.Ui_MainWindow):
         self.pushButton.clicked.connect(self.login)
         self.pushButton_2.clicked.connect(self.changep)
         self.pushButton_3.clicked.connect(self.send)
+
+        self.dbChatRoom.closeClient()
+
         #起一個thread做接受訊息
         th2 = threading.Thread(target=self.recvThreadFunc)
         th2.setDaemon(True)
@@ -62,16 +69,30 @@ class  ClientUI(QMainWindow,client_ui.Ui_MainWindow):
         text="Welcome to chat room !" + self.lineEdit.text() + "\nNow let\'s chat !"  +  self.lineEdit.text()
         self.textBrowser.append(text)
         self.textBrowser.update()
-        #傳給server名子
-        th2 = threading.Thread(target=self.system_notice)
-        th2.setDaemon(True)
-        th2.start()
 
-        self.label_4.setText('1')
-        self.pushButton.setDisabled(True)
-        self.lineEdit.setDisabled(True)
-        self.lineEdit_2.setDisabled(True)
-        self.pushButton_3.setDisabled(False)
+        name = self.dbChatRoom.collection.find_one({'uname' : self.lineEdit.text()})
+        print(name['upwd'])
+        if name['upwd'] == self.lineEdit_2.text():
+            #傳給server名子
+            th2 = threading.Thread(target=self.system_notice)
+            th2.setDaemon(True)
+            th2.start()
+
+            self.label_4.setText('1')
+            self.pushButton.setDisabled(True)
+            self.lineEdit.setDisabled(True)
+            self.lineEdit_2.setDisabled(True)
+            self.pushButton_3.setDisabled(False)
+
+        else:
+            warning = "Wrong Password!"
+            self.textBrowser.append(warning)
+            self.textBrowser.update()
+            self.pushButton.setDisabled(True)
+            self.lineEdit.setDisabled(True)
+            self.lineEdit_2.setDisabled(True)
+            self.lineEdit_3.setDisabled(True)
+            self.pushButton_2.setDisabled(True)
 
     # send鈕按下去，在自己視窗顯示mes，而另起一個thread傳我傳的訊息給server
     def send(self):
@@ -84,9 +105,21 @@ class  ClientUI(QMainWindow,client_ui.Ui_MainWindow):
         th1.start()
 
     def changep(self):
-        mes = " \n                                         " + self.lineEdit.text() + ": You"
-        self.textBrowser.append(mes)
-        self.textBrowser.update()
+        new_pwd = self.lineEdit_3.text()
+        self.dbChatRoom.updataUser(self.lineEdit.text(),new_pwd)
+
+class DataBaseChatRoom:
+    def __init__(self):
+        self.client = MongoClient('localhost', 27017)  # 比较常用
+        self.database = self.client["ChatRoom"]  # SQL: Database Name
+        self.collection = self.database["user"]  # SQL: Table Name
+
+    def updataUser(self, uname=None, upwd=None):
+        self.collection.update_one({"uname": uname}, {"$set": {"upwd": upwd}})
+        return 'successful'
+
+    def closeClient(self):
+        self.client.close()
 
 def main():
     app=QApplication(sys.argv)

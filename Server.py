@@ -93,7 +93,9 @@ class ServerUI(QMainWindow,server_ui.Ui_MainWindow):
 
         self.pushButton.clicked.connect(self.add)
         self.pushButton_2.clicked.connect(self.delete)
+
         self.dbChatRoom.closeClient()
+
         self.setWindowTitle("Chat Application")
 
     def add(self):
@@ -125,10 +127,6 @@ class DataBaseChatRoom:
         self.database = self.client["ChatRoom"]  # SQL: Database Name
         self.collection = self.database["user"]  # SQL: Table Name
 
-    def loadData(self):
-        pass
-        return None
-
     # delete user by uname
     # dbChatRoom.deleteUser(['A'])
     def deleteUser(self, unameList=None):
@@ -140,21 +138,6 @@ class DataBaseChatRoom:
     def insertUser(self, uname=None, upwd=None):
         self.collection.insert_one({'uname': uname, 'upwd': upwd})
         return 'successful'
-
-    def updataUser(self, uname=None, upwd=None):
-        pass
-        return 'successful'
-
-    # check checkUserExist
-    def checkUserExist(self, uname='A'):
-        pass
-        return False
-
-    # query user bu uname
-    # dbChatRoom.queryByuname(uname='A', upwd='A')
-    def queryByuname(self, uname='A', upwd='A'):
-        pass
-        return False
 
     # Init database
     # dbChatRoom.Initdatabase()
@@ -175,9 +158,9 @@ def main():
     app=QApplication(sys.argv)
     serverWindow=ServerUI()
     serverWindow.show()
-    #s = Server(host, 5550)
-    #while True:
-        #s.checkConnection()
+    s = Server(host, 5550)
+    while True:
+        s.checkConnection()
 
     sys.exit(app.exec_())
 
