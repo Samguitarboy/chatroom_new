@@ -114,11 +114,10 @@ class ServerUI(QMainWindow,server_ui.Ui_MainWindow):
         for bye in self.checkboxs:
             if bye.isChecked():
                 self.checkboxs.remove(bye)
-                deleteList.append(bye.text())
+                self.dbChatRoom.collection.remove({'uname': bye.text()})
                 self.vertical.removeWidget(bye)
                 bye.deleteLater()
                 bye = None
-        self.dbChatRoom.deleteUser(deleteList)
 
 
 class DataBaseChatRoom:
@@ -126,12 +125,6 @@ class DataBaseChatRoom:
         self.client = MongoClient('localhost', 27017)  # 比较常用
         self.database = self.client["ChatRoom"]  # SQL: Database Name
         self.collection = self.database["user"]  # SQL: Table Name
-
-    # delete user by uname
-    # dbChatRoom.deleteUser(['A'])
-    def deleteUser(self, unameList=None):
-        self.collection.remove(unameList)
-        return 'successful'
 
     # insert user
     # dbChatRoom.insertUser(uname='A', upwd='A')
@@ -153,16 +146,20 @@ class DataBaseChatRoom:
 
     def closeClient(self):
         self.client.close()
-
-def main():
+def ui():
     app=QApplication(sys.argv)
     serverWindow=ServerUI()
     serverWindow.show()
+    sys.exit(app.exec_())
+
+def main():
     s = Server(host, 5550)
+    #下面三行開啟，socket對話會壞掉
+    #mainthread = threading.Thread(target=ui())
+    #mainthread.setDaemon(True)
+    #mainthread.start()
     while True:
         s.checkConnection()
-
-    sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()
