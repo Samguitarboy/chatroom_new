@@ -2,7 +2,7 @@
 import sys
 import socket
 import threading
-from PyQt5.QtWidgets import QMainWindow,QApplication, QLineEdit
+from PyQt5.QtWidgets import QMainWindow,QApplication, QLineEdit,QCheckBox
 import server_ui
 from pymongo import MongoClient
 
@@ -80,31 +80,44 @@ class ServerUI(QMainWindow,server_ui.Ui_MainWindow):
         super(self.__class__,self).__init__()
         # GUI設定好
         self.setupUi(self)
+        self.checkboxs = []
+        self.checkboxs.append(self.checkBox_2)
+        self.checkboxs.append(self.checkBox_3)
+        self.checkboxs.append(self.checkBox_4)
+        self.checkboxs.append(self.checkBox_5)
+        self.checkboxs.append(self.checkBox_6)
 
-
-        self.lineEdit_2.setEchoMode(QLineEdit.Password)
         self.dbChatRoom = DataBaseChatRoom()
         self.dbChatRoom.collection.delete_many({})
         self.dbChatRoom.Initdatabase()
-        self.dbChatRoom.closeClient()
-        self.update_textBrowser()
+
         self.pushButton.clicked.connect(self.add)
+        self.pushButton_2.clicked.connect(self.delete)
+        self.dbChatRoom.closeClient()
         self.setWindowTitle("Chat Application")
 
     def add(self):
         uname = self.lineEdit.displayText()
-        upwd = self.lineEdit_2.displayText()
-        s = {'uname': uname, 'upwd': upwd}
-        self.dbChatRoom.collection.insert_one(s)
-        self.update_textBrowser()
+        upwd = self.lineEdit_2.text()
+        self.dbChatRoom.insertUser(uname,upwd)
 
-    def update_textBrowser(self):
-        cursor = self.dbChatRoom.collection.find()
-        data = [d for d in cursor]
-        u = ""
-        for i in data:
-            u += str(i["uname"]) + ","
-        self.textBrowser.setText(u)
+        self.checkBox_7 = QCheckBox(self.verticalLayoutWidget)
+        self.checkBox_7.setCheckable(True)
+        self.vertical.addWidget(self.checkBox_7)
+        self.checkBox_7.setText(uname)
+        self.checkboxs.append(self.checkBox_7)
+
+    def delete(self):
+        deleteList = []
+        for bye in self.checkboxs:
+            if bye.isChecked():
+                self.checkboxs.remove(bye)
+                deleteList.append(bye.text())
+                self.vertical.removeWidget(bye)
+                bye.deleteLater()
+                bye = None
+        self.dbChatRoom.deleteUser(deleteList)
+
 
 class DataBaseChatRoom:
     def __init__(self):
@@ -119,13 +132,13 @@ class DataBaseChatRoom:
     # delete user by uname
     # dbChatRoom.deleteUser(['A'])
     def deleteUser(self, unameList=None):
-        pass
+        self.collection.remove(unameList)
         return 'successful'
 
     # insert user
     # dbChatRoom.insertUser(uname='A', upwd='A')
     def insertUser(self, uname=None, upwd=None):
-        pass
+        self.collection.insert_one({'uname': uname, 'upwd': upwd})
         return 'successful'
 
     def updataUser(self, uname=None, upwd=None):
@@ -162,11 +175,10 @@ def main():
     app=QApplication(sys.argv)
     serverWindow=ServerUI()
     serverWindow.show()
-    s = Server(host, 5550)
-    while True:
-        s.checkConnection()
+    #s = Server(host, 5550)
+    #while True:
+        #s.checkConnection()
 
-    serverWindow.exec()
     sys.exit(app.exec_())
 
 if __name__ == "__main__":
